@@ -1,8 +1,26 @@
-#include <iostream>
+/**
+ * VUT FIT ISA 2018 project - feed reader.
+ *
+ * @file Main file.
+ * @author Dominik Harmim <xharmi00@stud.fit.vutbr.cz>
+ */
 
-int main()
+
+#include <cstdlib>
+#include "ArgumentProcessor.hpp"
+
+
+int main(int argc, char *argv[])
 {
-	std::cout << "Foo" << std::endl;
+	auto *argumentProcessor = new ArgumentProcessor();
+	if (!argumentProcessor->processArguments(argc, argv))
+	{
+		delete argumentProcessor;
+		return EXIT_FAILURE;
+	}
 
-	return 0;
+
+
+	delete argumentProcessor;
+	return EXIT_SUCCESS;
 }
