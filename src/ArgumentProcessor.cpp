@@ -6,7 +6,7 @@
  */
 
 
-#include <unistd.h>
+#include <getopt.h>
 #include <cctype>
 #include <cstdio>
 #include "ArgumentProcessor.hpp"
@@ -28,7 +28,7 @@ bool ArgumentProcessor::processArguments(int argc, char *argv[])
 	opterr = 0;
 
 	int opt;
-	while ((opt = getopt(argc, argv, "f:c:C:Tau")) != -1)
+	while ((opt = getopt_long(argc, argv, "f:c:C:Tau", nullptr, nullptr)) != -1)
 	{
 		switch (opt)
 		{
