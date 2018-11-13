@@ -7,8 +7,10 @@
 
 
 #include <cstdlib>
+
 #include "ArgumentProcessor.hpp"
 #include "UrlListFactory.hpp"
+#include "FeedProcessor.hpp"
 
 
 int main(int argc, char *argv[])
@@ -23,19 +25,18 @@ int main(int argc, char *argv[])
 		return EXIT_SUCCESS;
 	}
 
-	UrlListFactory urlListFactory;
 	std::vector<std::string> urlList;
-	if (argumentProcessor.getUrl() != nullptr)
+	if (argumentProcessor.getUrl())
 	{
-		urlList = urlListFactory.createUrlListFromUrl(
+		urlList = UrlListFactory::createUrlListFromUrl(
 			*argumentProcessor.getUrl()
 		);
 	}
-	else if (argumentProcessor.getFeedFile() != nullptr)
+	else if (argumentProcessor.getFeedFile())
 	{
 		try
 		{
-			urlList = urlListFactory.createUrlListFromFeedFile(
+			urlList = UrlListFactory::createUrlListFromFeedFile(
 				*argumentProcessor.getFeedFile()
 			);
 		}
@@ -45,5 +46,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	return EXIT_SUCCESS;
+	return FeedProcessor::processFeeds(urlList, &argumentProcessor)
+		? EXIT_SUCCESS
+		: EXIT_FAILURE;
 }

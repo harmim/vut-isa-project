@@ -9,6 +9,7 @@
 #include <getopt.h>
 #include <cctype>
 #include <cstdio>
+
 #include "ArgumentProcessor.hpp"
 #include "error.hpp"
 
@@ -181,13 +182,13 @@ void ArgumentProcessor::printUsageString()
 
 bool ArgumentProcessor::checkRequiredArguments()
 {
-	if (url == nullptr && feedFile == nullptr)
+	if (!url && !feedFile)
 	{
 		PRINT_ERR("Argument 'url' or '-f <feedfile>' is required.");
 		return false;
 	}
 
-	if (url != nullptr && feedFile != nullptr)
+	if (url && feedFile)
 	{
 		PRINT_ERR(
 			"Argument 'url' or '-f <feedfile>' is required but not both."

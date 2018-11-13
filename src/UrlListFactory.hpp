@@ -23,7 +23,9 @@ public:
 	 * @param feedFile Feed file location.
 	 * @return URL list created from feed file.
 	 */
-	std::vector<std::string> createUrlListFromFeedFile(std::string feedFile);
+	static std::vector<std::string> createUrlListFromFeedFile(
+		std::string feedFile
+	);
 
 	/**
 	 * Creates URL list from single URL.
@@ -31,7 +33,7 @@ public:
 	 * @param url Resource Url.
 	 * @return URL list created from single URL.
 	 */
-	std::vector<std::string> createUrlListFromUrl(std::string url);
+	static std::vector<std::string> createUrlListFromUrl(std::string url);
 };
 
 

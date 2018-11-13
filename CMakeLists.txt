@@ -5,7 +5,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.7)
 PROJECT(feedreader)
 
 SET(CMAKE_CXX_STANDARD 14)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -Wextra -Werror -pedantic -O2")
+SET(CMAKE_CXX_FLAGS_DEBUG
+	"${CMAKE_CXX_FLAGS} -W -Wall -Wextra -Werror -pedantic -g"
+	)
+SET(CMAKE_CXX_FLAGS_RELEASE
+	"${CMAKE_CXX_FLAGS} -W -Wall -Wextra -Werror -pedantic -O2"
+	)
 
 FILE(GLOB SOURCES "src/*.cpp")
 FILE(GLOB HEADERS "src/*.hpp")
