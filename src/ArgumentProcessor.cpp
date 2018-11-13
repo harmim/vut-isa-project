@@ -15,7 +15,6 @@
 
 ArgumentProcessor::~ArgumentProcessor()
 {
-	delete USAGE_STRING;
 	delete url;
 	delete feedFile;
 	delete certFile;
@@ -28,7 +27,12 @@ bool ArgumentProcessor::processArguments(int argc, char *argv[])
 	opterr = 0;
 
 	int opt;
-	while ((opt = getopt_long(argc, argv, "f:c:C:Tau", nullptr, nullptr)) != -1)
+	static const char *sOpts = "f:c:C:Tauh";
+	static const struct option lOpts[] = {
+		{"help", no_argument, nullptr, 'h'},
+		{nullptr, 0, nullptr, 0},
+	};
+	while ((opt = getopt_long(argc, argv, sOpts, lOpts, nullptr)) != -1)
 	{
 		switch (opt)
 		{
@@ -55,6 +59,10 @@ bool ArgumentProcessor::processArguments(int argc, char *argv[])
 			case 'u':
 				associatedUrl = true;
 				break;
+
+			case 'h':
+				printUsageString();
+				return true;
 
 			case '?':
 				if (optopt == 'f' || optopt == 'c' || optopt == 'C')
@@ -85,21 +93,20 @@ bool ArgumentProcessor::processArguments(int argc, char *argv[])
 	{
 		if (argc - optind > 1)
 		{
-			auto *unknownArguments = new std::string();
+			std::string unknownArguments;
 			for (int i = optind + 1; i < argc; i++)
 			{
-				unknownArguments->append(argv[i]);
+				unknownArguments.append(argv[i]);
 				if (i == argc - 1)
 				{
-					unknownArguments->append(".");
+					unknownArguments.append(".");
 				}
 				else
 				{
-					unknownArguments->append(", ");
+					unknownArguments.append(", ");
 				}
 			}
-			PRINTF_ERR("Unknown arguments: %s", unknownArguments->c_str());
-			delete unknownArguments;
+			PRINTF_ERR("Unknown arguments: %s", unknownArguments.c_str());
 			printUsageString();
 
 			return false;
@@ -160,9 +167,15 @@ bool ArgumentProcessor::isAssociatedUrl()
 }
 
 
+bool ArgumentProcessor::isHelp()
+{
+	return help;
+}
+
+
 void ArgumentProcessor::printUsageString()
 {
-	printf("\nusage:\n%s\n", USAGE_STRING->c_str());
+	printf("\nusage:\n%s\n", USAGE_STRING.c_str());
 }
 
 

@@ -8,19 +8,42 @@
 
 #include <cstdlib>
 #include "ArgumentProcessor.hpp"
+#include "UrlListFactory.hpp"
 
 
 int main(int argc, char *argv[])
 {
-	auto *argumentProcessor = new ArgumentProcessor();
-	if (!argumentProcessor->processArguments(argc, argv))
+	ArgumentProcessor argumentProcessor;
+	if (!argumentProcessor.processArguments(argc, argv))
 	{
-		delete argumentProcessor;
 		return EXIT_FAILURE;
 	}
+	if (argumentProcessor.isHelp())
+	{
+		return EXIT_SUCCESS;
+	}
 
+	UrlListFactory urlListFactory;
+	std::vector<std::string> urlList;
+	if (argumentProcessor.getUrl() != nullptr)
+	{
+		urlList = urlListFactory.createUrlListFromUrl(
+			*argumentProcessor.getUrl()
+		);
+	}
+	else if (argumentProcessor.getFeedFile() != nullptr)
+	{
+		try
+		{
+			urlList = urlListFactory.createUrlListFromFeedFile(
+				*argumentProcessor.getFeedFile()
+			);
+		}
+		catch (std::exception &e)
+		{
+			return EXIT_FAILURE;
+		}
+	}
 
-
-	delete argumentProcessor;
 	return EXIT_SUCCESS;
 }

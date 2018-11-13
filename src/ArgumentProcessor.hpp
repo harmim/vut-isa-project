@@ -6,8 +6,8 @@
  */
 
 
-#ifndef FEEDREADER_ARGUMENT_PROCESSOR_HPP
-#define FEEDREADER_ARGUMENT_PROCESSOR_HPP
+#ifndef FEEDREADER_ARGUMENTPROCESSOR_HPP
+#define FEEDREADER_ARGUMENTPROCESSOR_HPP
 
 
 #include <string>
@@ -16,7 +16,6 @@
 class ArgumentProcessor
 {
 public:
-
 	/**
 	 * Destructs argument processor object.
 	 */
@@ -66,13 +65,16 @@ public:
 	 */
 	bool isAssociatedUrl();
 
+	/**
+	 * @return Has the help been printed?
+	 */
+	bool isHelp();
 
 private:
-
 	/**
 	 * Help usage string.
 	 */
-	const std::string *USAGE_STRING = new std::string(
+	const std::string USAGE_STRING =
 		"    feedreader <url | -f <feedFile>> [-c <certFile>] [-C <certDir>]"
 		" [-T] [-a] [-u]\n"
 		"        url           - resource URL\n"
@@ -82,7 +84,7 @@ private:
 		"        -T            - display modification or creation time\n"
 		"        -a            - display author name or email\n"
 		"        -u            - display associated URL\n"
-	);
+	;
 
 	/**
 	 * Resource URL.
@@ -119,6 +121,10 @@ private:
 	 */
 	bool associatedUrl = false;
 
+	/**
+	 * Has the help been printed?
+	 */
+	bool help = false;
 
 	/**
 	 * Prints help usage string.
@@ -134,4 +140,4 @@ private:
 };
 
 
-#endif //FEEDREADER_ARGUMENT_PROCESSOR_HPP
+#endif //FEEDREADER_ARGUMENTPROCESSOR_HPP
