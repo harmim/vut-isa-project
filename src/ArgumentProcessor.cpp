@@ -97,14 +97,14 @@ bool ArgumentProcessor::processArguments(int argc, char *argv[])
 			std::string unknownArguments;
 			for (int i = optind + 1; i < argc; i++)
 			{
-				unknownArguments.append(argv[i]);
+				unknownArguments += argv[i];
 				if (i == argc - 1)
 				{
-					unknownArguments.append(".");
+					unknownArguments += ".";
 				}
 				else
 				{
-					unknownArguments.append(", ");
+					unknownArguments += ", ";
 				}
 			}
 			PRINTF_ERR("Unknown arguments: %s", unknownArguments.c_str());

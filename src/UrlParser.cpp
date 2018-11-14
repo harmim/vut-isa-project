@@ -21,7 +21,7 @@ UrlParser::~UrlParser()
 bool UrlParser::parseUrl(std::string url)
 {
 	std::regex regex(
-		R"(^(https?)://([^\/\?#:]+)(:([0-9]+))?(.*)$)",
+		R"(^(https?)://([^/?#:]+)(:([0-9]+))?(.*)$)",
 		std::regex::extended
 	);
 	std::smatch matches;

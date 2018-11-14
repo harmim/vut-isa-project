@@ -29,6 +29,19 @@ public:
 	static bool processFeeds(
 		std::vector<std::string> urlList, ArgumentProcessor *argumentProcessor
 	);
+
+private:
+	/**
+	 * Parses HTTP response and returns its body.
+	 *
+	 * @param response HTTP response to be parsed.
+	 * @param responseBody[out] HTTP response body.
+	 * @return True if the HTTP response has been parsed successfully,
+	 *         false otherwise.
+	 */
+	static bool parseHttpResponse(
+		std::string response, std::string *responseBody
+	);
 };
 
 

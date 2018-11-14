@@ -9,10 +9,12 @@
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include <regex>
 
 #include "FeedProcessor.hpp"
 #include "UrlParser.hpp"
 #include "error.hpp"
+#include "XmlParser.hpp"
 
 
 #define READ_BUFFER_SIZE 4096
@@ -140,19 +142,19 @@ bool FeedProcessor::processFeeds(
 			PROCESS_BIO_ERROR;
 		}
 
-		std::string writeData(
+		std::string request(
 			"GET " + *urlParser.getPath() + " HTTP/1.0\r\n"
 			"Host: " + *urlParser.getAuthority() + "\r\n"
 			"Connection: Close\r\n"
 			"User-Agent: Mozilla/5.0 Chrome/70.0.3538.77 Safari/537.36\r\n"
 			"\r\n"
 		);
-		auto writeDataSize = static_cast<int>(writeData.size());
+		auto writeDataSize = static_cast<int>(request.size());
 		bool firstWrite = true, writeDone = false;
 		while (firstWrite || BIO_should_retry(bio))
 		{
 			firstWrite = false;
-			if (BIO_write(bio, writeData.c_str(), writeDataSize))
+			if (BIO_write(bio, request.c_str(), writeDataSize))
 			{
 				writeDone = true;
 				break;
@@ -160,12 +162,12 @@ bool FeedProcessor::processFeeds(
 		}
 		if (!writeDone)
 		{
-			PRINT_ERR("Bio write error");
+			PRINT_ERR("Bio write error.");
 			PROCESS_BIO_ERROR;
 		}
 
-		char readBuffer[READ_BUFFER_SIZE] = {'\0'};
-		std::string readData;
+		char responseBuffer[READ_BUFFER_SIZE] = {'\0'};
+		std::string response;
 		int readResult = 0;
 		do
 		{
@@ -173,13 +175,14 @@ bool FeedProcessor::processFeeds(
 			while (firstRead || BIO_should_retry(bio))
 			{
 				firstRead = false;
-				readResult = BIO_read(bio, readBuffer, READ_BUFFER_SIZE - 1);
+				readResult =
+					BIO_read(bio, responseBuffer, READ_BUFFER_SIZE - 1);
 				if (readResult >= 0)
 				{
 					if (readResult > 0)
 					{
-						readBuffer[readResult] = '\0';
-						readData += readBuffer;
+						responseBuffer[readResult] = '\0';
+						response += responseBuffer;
 					}
 
 					readDone = true;
@@ -188,14 +191,64 @@ bool FeedProcessor::processFeeds(
 			}
 			if (!readDone)
 			{
-				PRINT_ERR("Bio read error");
+				PRINT_ERR("Bio read error.");
 				PROCESS_BIO_ERROR;
 			}
 		}
 		while (readResult != 0);
 
+		std::string responseBody;
+		if (!parseHttpResponse(response, &responseBody))
+		{
+			PRINTF_ERR("Invalid HTTP response from '%s'", url.c_str());
+			CLEAN_RESOURCES;
+			PROCESS_ERROR;
+		}
+
+		if (!XmlParser::parseXmlFeed(responseBody, argumentProcessor))
+		{
+			PRINTF_ERR("Invalid feed format from '%s'.", url.c_str());
+			CLEAN_RESOURCES;
+			PROCESS_ERROR;
+		}
+
 		CLEAN_RESOURCES;
 	}
+
+	return true;
+}
+
+
+bool FeedProcessor::parseHttpResponse(
+	std::string response, std::string *responseBody
+)
+{
+	size_t endOfHeaderPosition = response.find("\r\n\r\n");
+	if (endOfHeaderPosition == std::string::npos)
+	{
+		endOfHeaderPosition = response.find("\n\n");
+		if (endOfHeaderPosition == std::string::npos)
+		{
+			return false;
+		}
+		endOfHeaderPosition += 2;
+	}
+	else
+	{
+		endOfHeaderPosition += 4;
+	}
+
+	std::string responseHead = response.substr(0, endOfHeaderPosition);
+	std::regex regex(
+		R"(^HTTP/[0-9]\.[0-9] 2[0-9][0-9].*$)",
+		std::regex::extended
+	);
+	if (!std::regex_match(responseHead, regex))
+	{
+		return false;
+	}
+
+	*responseBody = response.substr(endOfHeaderPosition);
 
 	return true;
 }

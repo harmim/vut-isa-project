@@ -83,8 +83,7 @@ private:
 		"        -C <certDir>  - certificates directory location\n"
 		"        -T            - display modification or creation time\n"
 		"        -a            - display author name or email\n"
-		"        -u            - display associated URL\n"
-	;
+		"        -u            - display associated URL\n";
 
 	/**
 	 * Resource URL.
