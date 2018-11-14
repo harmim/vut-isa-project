@@ -11,7 +11,7 @@
 
 
 #include <string>
-#include <libxml2/libxml/parser.h>
+#include <libxml/parser.h>
 
 #include "ArgumentProcessor.hpp"
 
