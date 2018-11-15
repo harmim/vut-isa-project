@@ -33,9 +33,7 @@
 
 #define PROCESS_BIO_ERROR \
 	{ \
-#ifdef DEBUG \
 		PRINTF_ERR("Error: %s.\n", ERR_reason_error_string(ERR_get_error())); \
-#endif \
 		CLEAN_RESOURCES; \
 		PROCESS_ERROR; \
 	}
