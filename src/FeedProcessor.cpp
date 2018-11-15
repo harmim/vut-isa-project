@@ -33,7 +33,9 @@
 
 #define PROCESS_BIO_ERROR \
 	{ \
-		PRINTF_ERR("Error: %s.\n", ERR_reason_error_string(ERR_get_error())); \
+		PRINTF_ERR( \
+			"Bio error: %s.\n", ERR_reason_error_string(ERR_get_error()) \
+		); \
 		CLEAN_RESOURCES; \
 		PROCESS_ERROR; \
 	}
