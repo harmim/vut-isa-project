@@ -48,8 +48,11 @@ bool FeedProcessor::processFeeds(
 	ERR_load_BIO_strings();
 	OpenSSL_add_all_algorithms();
 
+	size_t counter = 0, urlListSize = urlList.size();
 	for (const auto &url : urlList)
 	{
+		counter++;
+
 		UrlParser urlParser;
 		if (!urlParser.parseUrl(url))
 		{
@@ -114,7 +117,7 @@ bool FeedProcessor::processFeeds(
 			bio = BIO_new_ssl_connect(ctx);
 		}
 
-		if (bio == nullptr)
+		if (!bio)
 		{
 			PRINTF_ERR("Connection to '%s' failed.", url.c_str());
 			PROCESS_BIO_ERROR;
@@ -205,11 +208,15 @@ bool FeedProcessor::processFeeds(
 			PROCESS_ERROR;
 		}
 
-		if (!XmlParser::parseXmlFeed(responseBody, argumentProcessor))
+		if (!XmlParser::parseXmlFeed(responseBody, argumentProcessor, url))
 		{
-			PRINTF_ERR("Invalid feed format from '%s'.", url.c_str());
 			CLEAN_RESOURCES;
 			PROCESS_ERROR;
+		}
+
+		if (counter < urlListSize)
+		{
+			printf("\n");
 		}
 
 		CLEAN_RESOURCES;
