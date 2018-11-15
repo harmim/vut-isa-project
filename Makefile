@@ -23,3 +23,8 @@ pack: $(PACK).tar
 
 $(PACK).tar:
 	tar -cf $@ CMakeLists.txt Makefile README src/*
+
+
+.PHONY: test
+test:
+	@ echo 'TODO'
