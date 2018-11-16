@@ -76,6 +76,7 @@ bool XmlParser::parseXmlFeed(
 	}
 
 	xmlFreeDoc(doc);
+	xmlCleanupParser();
 	return result;
 }
 
