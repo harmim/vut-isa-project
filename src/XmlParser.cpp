@@ -35,7 +35,7 @@ bool XmlParser::parseXmlFeed(
 	std::string xml, ArgumentProcessor *argumentProcessor, std::string url
 )
 {
-#ifndef DEBUG
+#ifdef DEBUG
 	xmlSetGenericErrorFunc(nullptr, XmlParser::xmlGenericErrorFunc);
 	xmlSetStructuredErrorFunc(nullptr, XmlParser::xmlStructuredErrorFunc);
 #endif
@@ -44,6 +44,7 @@ bool XmlParser::parseXmlFeed(
 	if (!doc)
 	{
 		PRINTF_ERR("Invalid feed format on '%s'.", url.c_str());
+		xmlCleanupParser();
 		return false;
 	}
 
@@ -52,6 +53,7 @@ bool XmlParser::parseXmlFeed(
 	{
 		PRINTF_ERR("Empty feed file on '%s'.", url.c_str());
 		xmlFreeDoc(doc);
+		xmlCleanupParser();
 		return false;
 	}
 
@@ -140,7 +142,7 @@ bool XmlParser::parseRss1(
 	}
 	if (title.empty())
 	{
-		PRINTF_ERR("Feed title is empty on '%s'", url.c_str());
+		PRINTF_ERR("Feed title is empty on '%s'.", url.c_str());
 		return false;
 	}
 	PRINT_TITLE(title.c_str());
@@ -217,7 +219,7 @@ bool XmlParser::parseRss2(
 	}
 	if (title.empty())
 	{
-		PRINTF_ERR("Feed title is empty on '%s'", url.c_str());
+		PRINTF_ERR("Feed title is empty on '%s'.", url.c_str());
 		return false;
 	}
 	PRINT_TITLE(title.c_str());
@@ -304,7 +306,7 @@ bool XmlParser::parseAtom(
 	}
 	if (title.empty())
 	{
-		PRINTF_ERR("Feed title is empty on '%s'", url.c_str());
+		PRINTF_ERR("Feed title is empty on '%s'.", url.c_str());
 		return false;
 	}
 	PRINT_TITLE(title.c_str());

@@ -206,7 +206,7 @@ bool FeedProcessor::processFeeds(
 		std::string responseBody;
 		if (!parseHttpResponse(response, &responseBody))
 		{
-			PRINTF_ERR("Invalid HTTP response from '%s'", url.c_str());
+			PRINTF_ERR("Invalid HTTP response from '%s'.", url.c_str());
 			CLEAN_RESOURCES;
 			PROCESS_ERROR;
 		}

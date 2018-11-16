@@ -62,6 +62,7 @@ bool ArgumentProcessor::processArguments(int argc, char *argv[])
 				break;
 
 			case 'h':
+				help = true;
 				printUsageString();
 				return true;
 

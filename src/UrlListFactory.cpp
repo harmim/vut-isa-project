@@ -20,7 +20,7 @@ std::vector<std::string> UrlListFactory::createUrlListFromFeedFile(
 	std::ifstream file(feedFile);
 	if (!file.is_open())
 	{
-		PRINTF_ERR("Unable to open file %s.", feedFile.c_str());
+		PRINTF_ERR("Unable to open file '%s'.", feedFile.c_str());
 		throw std::exception();
 	}
 

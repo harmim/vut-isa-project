@@ -14,6 +14,7 @@
 
 
 #define PRINT_ERR(_e) fprintf(stderr, (_e "\n"))
+
 #define PRINTF_ERR(_e, ...) fprintf(stderr, (_e "\n"), __VA_ARGS__)
 
 
