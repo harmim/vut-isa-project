@@ -1,0 +1,326 @@
+% Author: Dominik Harmim <xharmi00@stud.fit.vutbr.cz>
+
+
+\documentclass[a4paper, 11pt]{article}
+
+
+\usepackage[czech]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[left=2cm, top=3cm, text={17cm, 24cm}]{geometry}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage[unicode]{hyperref}
+\hypersetup{
+	colorlinks = true,
+	hypertexnames = false,
+	citecolor = red
+}
+
+
+\begin{document}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Titulní stránka %%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{titlepage}
+		\begin{center}
+			\includegraphics[width=0.77\linewidth]{inc/FIT_logo.pdf} \\
+
+			\vspace{\stretch{0.382}}
+
+			\Huge{Projektová dokumentace} \\
+			\LARGE{\textbf{
+				Čtečka novinek ve formátu Atom a~RSS s~podporou TLS
+			}} \\
+			\Large{Síťové aplikace a~správa sítí}
+
+			\vspace{\stretch{0.618}}
+		\end{center}
+
+		{\Large
+			\today
+			\hfill
+			Dominik Harmim (xharmi00)
+		}
+	\end{titlepage}
+
+
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Obsah %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\pagenumbering{roman}
+	\setcounter{page}{1}
+	\tableofcontents
+	\clearpage
+
+
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Úvod %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\pagenumbering{arabic}
+	\setcounter{page}{1}
+
+	\section{Úvod}
+
+	Cílem projektu bylo vytvořit komunikující aplikaci v~jazyce C/C++.
+	Vytvořil jsem program, který stahuje XML soubory (tzv. \texttt{feedy})
+	přes síť Internet a~tyto soubory zpracovává a~vypisuje v~nich uvedné
+	informace.
+
+	Program zpracovává XML soubory ve formátu \texttt{Atom} a~\texttt{RSS},
+	přičemž podporované verze jsou \texttt{Atom 1.0} \cite{atom},
+	\texttt{RSS 1.0} \cite{rss1} a~\texttt{RSS 2.0} \cite{rss2}.
+
+	Program po spuštění stáhne zdroje a~na standardní výstup vypíše informace
+	požadované uživatelem. Vstupní zdroje i~výstupní informace je možné
+	nastavovat vstupními argumenty programu, viz \ref{section:usage}.
+
+
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Návrh a implementace %%%%%%%%%%%%%%%%%%%%%%
+	\section{Návrh a~implementace}
+
+	Aplikace je rozdělena do několika zdrojových souborů a~tříd, které
+	implementují požadované chování. Veškeré zdrojové soubory se nachází
+	v~adresáři \texttt{./src}. V~této kapitole jsou stručně popsány jednotlivé
+	části implementace.
+
+
+	\subsection{Vstupní bod programu, \texttt{feedreader.cpp}}
+
+	V~tomto souboru se nachází funkce \texttt{main}, která příjme vstupní
+	argumenty programu a~následně jsou zpracovány třídou
+	\texttt{ArgumentProcessor} \ref{section:argument_processor}.
+	Pokud zpracování argumentů selže, je program ukončen s~chybovým kódem.
+
+	Dále je vytvořen seznam URL zdrojů, které se budou zpracovávat. Tento
+	seznam je vytvořen třídou
+	\\ \texttt{UrlListFactory} \ref{section:url_list_factory}.
+
+	Seznam zdrojů URL je dále zpracováván třídou \texttt{FeedProcessor}
+	\ref{section:feed_processor}. Pokud zpracování selže, program skončí
+	s~chybovým kódem, v~opačném případě program úspěšně skončí.
+
+
+	\subsection{Zpracování argumentů, \texttt{ArgumentProcessor}}
+	\label{section:argument_processor}
+
+	Třída \texttt{ArgumentProcessor} je definovaná v~souboru
+	\texttt{ArgumentProcessor.hpp} a~implementovaná v~souboru
+	\texttt{ArgumentProcessor.cpp}.
+
+	Tato třída zpracovává vstupní argumenty programu programem \texttt{getopt}
+	\cite{getopt}. Pro zpracování argumentů jsem použil funkci
+	\texttt{getopt\_long}, která umí pracovat i~s~dlouhými jmény argumentů
+	a~chová se na všech systémech ekvivalentně na rozdíl od funkce
+	\texttt{getopt}.
+
+	Při chybně zadaných argumentech je výpsána nápověda programu, případně
+	chybová zpráva.
+
+
+	\subsection{Zpracování chyb, \texttt{error.hpp}}
+
+	V~tomto hlavičkovém souboru jsou definovaná makra pro výpis chybových
+	zpráv na standardní chybový výstup.
+
+
+	\subsection{Vytvoření seznamu URL zdrojů, \texttt{UrlListFactory}}
+	\label{section:url_list_factory}
+
+	Třída \texttt{UrlListFactory} je definovaná v~souboru
+	\texttt{UrlListFactory.hpp} a~implementovaná v~souboru
+	\texttt{UrlListFactory.cpp}.
+
+	Tato třída vytváří seznam URL zdrojů buď ze zadaného URL zdroje jako
+	argumentu programu nebo ze souboru \texttt{feedfile} zadaného jako
+	argument programu, který obsahuje jednotlivé URL zdrojů, na každém
+	řádku jedno URL.
+
+	Pokd zpracování souboru \texttt{feedfile} selže, je vypsaná chybová
+	zpráva. Prázdné řádky a~řádky začínající znakem \texttt{\#} v~souboru
+	\texttt{feedfile} jsou ignorovány. Počítá se s~tím, že každý řádek
+	tohoto souboru bude zakončen znakem \texttt{LF}.
+
+
+	\subsection{Zpracování zdrojů, \texttt{FeedProcessor}}
+	\label{section:feed_processor}
+
+	Třída \texttt{FeedProcessor} je definovaná v~souboru
+	\texttt{FeedProcessor.hpp} a~implementovaná v~souboru
+	\\ \texttt{FeedProcessor.cpp}.
+
+	Tato třída stahuje jednotlivé zdrojové soubory a~následně je dále
+	zpracovává. Stahování probíhá pomocí knihovny \texttt{OpenSSL}
+	\cite{openSSL}. Při práci na tomto úkolu jsem studoval tento článek
+	\cite{openSSL_tutorial}, a~proto jsem se při implementaci této třídy řídil
+	některými doporučeními z~tohoto článku.
+
+	Zpracovávám postupně jednotlivé URL zdrojů, jedno po druhém. Pokud je na
+	vstupu zadaných více URL zdrojů a~zpracování jednoho ze drojů selže, tak
+	pokračuji zpracováváním dalšího zdroje.
+
+	Nejdříve provedu validaci a~prsování URL třídou \texttt{UrlParser}
+	\ref{section:url_parser}. Pokud toto selže, tak vypisuji chybovou
+	zprávu.
+
+	Dále provádím připojení k~danému zdroji. Pokud se používá SSL, tak
+	nastavím umístění certifikátů pro ověření platnosti certifikátů
+	předložených serverem. Umístění těchto certifikátů nastavuji buď
+	z~argumentů programu, pokud jsou tyto zadány nebo použiji výchozí
+	umístění, které definuje \texttt{OpenSSL} knihovna. Pokud ověření
+	certifikátů nebo připojení k~serveru selže, tak vypíši chybovou zprávu.
+
+	Pokud úspěšně provede připojení k~serveru, tak se nejdříve odešle HTTP
+	GET požadavek na daný zdroj daného serveru. Následně se přečtě HTTP
+	odpověď serveru. Pokud při zápisu, či čtení HTTP požadavku, či odpovědi
+	nastane chyba, tak se vypíše chybová zpráva.
+
+	Při úspěšném přečtení HTTP odpovědi se provede parsování této odpovědi.
+	Oddělí se hlavička od těla odpovědi a~provede se validace. Za validní
+	odpovědi jsou považovány všechny odpovědi s~HTTP kódem s~hodnotou $ x $,
+	kde $ 200 \leq x < 300 $. Pokud validace HTTP odpovědi selže, je vypsána
+	chybová zpráva.
+
+	Nakonec je provedeno parosvání XML dokumentu v~těle HTTP odpovědi
+	a~výpis patřičných inforamcí třídou \texttt{XmlParser}
+	\ref{section:xml_parser}. Pokud toto parsování selže, je vypsána chybový
+	zpráva.
+
+
+	\subsection{Parsování URL, \texttt{UrlParser}}
+	\label{section:url_parser}
+
+	Třída \texttt{UrlParser} je definovaná v~souboru
+	\texttt{UrlParser.hpp} a~implementovaná v~souboru
+	\texttt{UrlParser.cpp}.
+
+	Tato třída slouží k~parsování URL. Tj. k~zjištění, jestli je předložené
+	URL validní URL podle \texttt{RFC 3986} \cite{url} a~rozložení daného
+	URL na jednotlivé části. Podporované jsou pouze schémata \texttt{http}
+	a~\texttt{https}. Pokud v~URL není uveden port, tak se doplňí podle
+	schématu, buď \texttt{80} nebo \texttt{443}.
+
+	Samotné parsování URL probíhá pomocí knihovny pro regulární výrazy, viz
+	\cite{regex}.
+
+
+	\subsection{Parsování XML, \texttt{XmlParser}}
+	\label{section:xml_parser}
+
+	Třída \texttt{XmlParser} je definovaná v~souboru
+	\texttt{XmlParser.hpp} a~implementovaná v~souboru
+	\texttt{XmlParser.cpp}.
+
+	Tato třída slouží k~parsování XML zdroje. Jsou podporovány pouze zdroje
+	ve formátu \texttt{Atom 1.0} \cite{atom}, \texttt{RSS 1.0} \cite{rss1}
+	a~\texttt{RSS 2.0} \cite{rss2}.
+
+	Samotné parsování XML probíhá pomocí knihovny \texttt{Libxml2}
+	\cite{libxml}, \cite{libxml_tutorial}.
+
+	Pokud XML struktura parsovaného souboru není validní, v~souboru se
+	nenachází kořenový element nebo typ XML souboru není podporovaný,
+	vypíše se chybová zpráva.
+
+	\subsubsection{Vypisování inforamcí ze zdrojového souboru}
+
+	Nejdříve je vždy vypsán titulek daného zdrojového souboru. Pokud titulek
+	ve zdroji chybí, tak se zpracovávání daného zdroje ukončí. Výpis titulku
+	je vždy uvozen znaky \uv{*** } a~zanončen znaky \uv{ ***}.
+
+	Následně jsou vypisovány jednotlivé položky zdrojových soburů. Nejdříve je
+	vypsán titulek položky a~potom případně další doplňující informace.
+	Nejdříve čas vytvoření nebo změny záznamu uvozen znaky \uv{Time: }, potom
+	jméno, či e-mailová adresa autora dané položky uvozena znaky \uv{Author: }
+	a~nakonec asociované URL uvozené znaky \uv{URL: }. Pokud některá
+	z~položek není ve zdroji uvedena, tak se nebude vypisovat.
+
+
+	\subsection{Překladový systém}
+	\label{section:compilation}
+
+	Překladový systém jako takový je vytvořen v~programu \texttt{CMake}.
+	Definice tohoto systému se nachází v~souboru \texttt{CMakeLists.txt}.
+	Nachází se zde definice názvu spustitelného souboru, definice zdrojových
+	souborů, definice použitého C++ standardu, definice argumentů překladače
+	a~definice linkovaných knihoven.
+
+	Spouštení překladu je realizováno programem \texttt{GNU Make}, který po
+	spuštění \texttt{make} nebo \texttt{make feedreader} přeloží program
+	nástrojem \texttt{CMake} a~vytvoří spustitelný soubor \texttt{feedreader}
+	v~kořenovém adresáři projektu. Spuštěním příkazu \texttt{make clean}
+	je možné odstranit všechny soubory vytvoření při překladu.
+
+
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Návod na použití %%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Návod na použití}
+	\label{section:usage}
+
+	Po překladu programu, viz \ref{section:compilation}, je vytvořen
+	spustitelný program \texttt{feedreader}.
+
+
+	\subsection{Syntaxe a~sémantika spouštění programu}
+
+	\texttt{
+		./feedreader <url | -f <feedFile>> [-c <certFile>] [-C <certDir>]
+			[-T] [-a] [-u]
+	}
+	\begin{itemize}
+		\item \texttt{url} URL zdroje.
+		\item \texttt{-f <feedFile>} Soubor \texttt{feedfile}. (Textový soubor,
+			kde je na každém řádku uvedena URL zdroje. Prázdné řádky a~řádky
+			začínající znakem \texttt{\#} jsou ignorovány. Poslední znak na
+			každém řádku musí být \texttt{LF}.)
+		\item \texttt{-c <certFile>} Soubor s~certifikáty pro ověření
+			platnosti certifikátu předloženého serverem při použití SSL/TLS.
+		\item \texttt{-C <certDir>} Adresář, ve kterém se vyhledávají
+			certifikáty, které se použijí pro ověření platnosti certifikátu
+			předloženého serverem při použití SSL/TLS.
+		\item \texttt{-T} Pro každý zdroj se navíc zobrazí informace o~čase
+			změny, či vytvoření zázamu.
+		\item \texttt{-a} Pro každý zdroj se navíc zobrazí jméno, či e-mailová
+			adresa autora záznamu.
+		\item \texttt{-u} Pro každý zdroj se navíc zobrazí asociované URL
+			záznamu.
+	\end{itemize}
+	Povinně je potřeba uvést buď URL zdroje nebo soubor \texttt{feedfile}.
+	Podporovaná schémata zdrojů jsou \texttt{http} a~\texttt{https}.
+	Parametry je možné zadávat v~libovolném pořadí. Je možné zadávat parametry
+	bez argumentů i~následujícím způsobem \texttt{-Tau}. Protože je
+	zpracování argumentů realizováno programem \texttt{getopt}, tak platí
+	standardní chování definováné tímto programem, viz \cite{getopt}.
+
+	Při chybně zadaných parametrech se vypíše napověda programu. Nápovědu
+	je možné si vypsat i~příkazem \texttt{./feedreader -h} nebo
+	\texttt{./feedreader --help}.
+
+
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Závěr %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Závěr}
+
+	Podařilo se mi implementovat všechny části aplikace, které byly uvedené
+	v~zadání projektu. Při konečném testování projektu jsem nezaznamenal žádné
+	chybné chování programu.
+
+	Projekt pro mě nebyl nijak časově náročný. Nastudování potřebných informací
+	a~samotná implementace mi nezabrala více než několik hodin.
+
+	Při práci na projektu jsem se především zdokonalil v programování
+	v~jazyce C++, naučil jsem se pracovat s~knihovnou \texttt{OpenSSL}
+	\cite{openSSL}, zjistil, jak funguje komunikace přes HTTPS a~jak funguje
+	ověřování certifikátů \cite{openSSL_tutorial}, naučil jsem se pracovat
+	s~knihovnou \texttt{Libxml2} \cite{libxml}, \cite{libxml_tutorial},
+	nastudoval jsem si, jak je definován formát URI podle \texttt{RFC 3986}
+	\cite{url}, naučil jsem se pracovat s~knihovnou pro práci s~regulárními
+	výrazy \cite{regex}, naučil jsem se zpracovávat argumenty programu
+	programem \texttt{getopt} \cite{getopt} a~nastudoval jsem si definici
+	\texttt{Atom 1.0} \cite{atom}, \texttt{RSS 1.0} \cite{rss1}
+	a~\texttt{RSS 2.0} \cite{rss2}.
+
+
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Citace %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\clearpage
+	\bibliographystyle{czechiso}
+	\renewcommand{\refname}{Literatura}
+	\bibliography{manual}
+\end{document}
