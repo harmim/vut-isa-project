@@ -1,0 +1,56 @@
+# Síťové aplikace a správa sítí - Projekt
+### Čtečka novinek ve formátu Atom a RSS s podporou TLS
+
+### Autor: Dominik Harmim <xharmi00@stud.fit.vutbr.cz>
+
+### Popis programu
+Program vypisuje informace uvedené ve stažených zdrojích ("feedech") ve
+formátu Atom a RSS. Podporované verze zdroje jsou Atom 1.0, RSS 1.0 a RSS 2.0.
+Program po spuštění stáhne zadané zdroje a na standardní výstup vypíše
+informace požadované uživatelem.
+
+### Vytvoření spustitelného programu ze zdrojových kódů
+Překladový systém je vytvořen v programu CMake (nastavení překladače,
+parametry překladu, definice zdrojových souborů, spustitelný soubor a
+linkované knihovny). Nicméně je zde vytvořen překlad programem Make, který
+využívá CMake. `make` nebo `make feedreader` vytvoří spustilený soubor
+`feedreader` v kořenovém adresáři. `make clean` odstraní všechny soubory
+vytvořené při překladu.
+
+### Použití programu
+Po překladu je možné spouštět vytvořený spustitelný soubor `feedreader`.
+Syntaxe a sémantika spouštění:
+`./feedreader <url | -f <feedFile>> [-c <certFile>] [-C <certDir>] [-T] [-a] [-u]`
+  - `url` URL zdroje.
+  - `-f <feedFile>` Soubor `feedfile`. (Textový soubor, kde je na každém řádku
+    uvedena URL zdroje. Prázdné řádky a řádky začínající znakem `#` jsou
+    ignorovány. Poslední znak na každém řádku musí být `LF`.)
+  - `-c <certFile>` Soubor s certifikáty pro ověření platnosti certifikátu
+    předloženého serverem při použití SSL/TLS.
+  - `-C <certDir>` Adresář, ve kterém se vyhledávají certifikáty, které se
+    použijí pro ověření platnosti certifikátu předloženého serverem při
+    použití SSL/TLS.
+  - `-T` Pro každý zdroj se navíc zobrazí informace o čase změny, či vytvoření
+    zázamu.
+  - `-a` Pro každý zdroj se navíc zobrazí jméno, či e-mailová adresa autora
+    záznamu.
+  - `-u` Pro každý zdroj se navíc zobrazí asociované URL záznamu.
+Povinně je potřeba uvést buď URL zdroje nebo soubor `feedfile`. Podporovaná
+schémata zdrojů jsou `http` a `https`.
+
+### Seznam odevzdaných souborů
+- `./CMakeLists.txt`
+- `./Makefile`
+- `./README`
+- `./src/ArgumentProcessor.cpp`
+- `./src/ArgumentProcessor.hpp`
+- `./src/error.hpp`
+- `./src/FeedProcessor.cpp`
+- `./src/FeedProcessor.hpp`
+- `./src/feedreader.cpp`
+- `./src/UrlListFactory.cpp`
+- `./src/UrlListFactory.hpp`
+- `./src/UrlParser.cpp`
+- `./src/UrlParser.hpp`
+- `./src/XmlParser.cpp`
+- `./src/XmlParser.hpp`
