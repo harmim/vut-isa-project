@@ -22,11 +22,13 @@
 			if (!associatedUrl.empty()) \
 				printf("URL: %s\n", associatedUrl.c_str()); \
 			if ( \
-				argumentProcessor->isTime() \
-				|| argumentProcessor->isAuthor() \
-				|| argumentProcessor->isAssociatedUrl()\
-			) \
-				printf("\n"); \
+				i < itemCount - 1 \
+				&& ( \
+					argumentProcessor->isTime() \
+					|| argumentProcessor->isAuthor() \
+					|| argumentProcessor->isAssociatedUrl() \
+				) \
+			) printf("\n"); \
 		} \
 	}
 
@@ -35,10 +37,11 @@ bool XmlParser::parseXmlFeed(
 	std::string xml, ArgumentProcessor *argumentProcessor, std::string url
 )
 {
-#ifdef DEBUG
+#ifndef DEBUG
 	xmlSetGenericErrorFunc(nullptr, XmlParser::xmlGenericErrorFunc);
 	xmlSetStructuredErrorFunc(nullptr, XmlParser::xmlStructuredErrorFunc);
 #endif
+	xmlKeepBlanksDefault(0);
 
 	xmlDocPtr doc = xmlParseDoc((const xmlChar *) xml.c_str());
 	if (!doc)
@@ -147,7 +150,12 @@ bool XmlParser::parseRss1(
 	}
 	PRINT_TITLE(title.c_str());
 
-	for (auto rootNode = root->children; rootNode; rootNode = rootNode->next)
+	unsigned long itemCount = xmlChildElementCount(root), i = 0;
+	for (
+		auto rootNode = root->children;
+		rootNode;
+		rootNode = rootNode->next, i++
+	)
 	{
 		if (!xmlStrcasecmp(rootNode->name, (xmlChar *) "item"))
 		{
@@ -206,7 +214,7 @@ bool XmlParser::parseRss2(
 				auto channelNode = rootNode->children;
 				channelNode;
 				channelNode = channelNode->next
-				)
+			)
 			{
 				if (!xmlStrcasecmp(channelNode->name, (xmlChar *) "title"))
 				{
@@ -228,10 +236,11 @@ bool XmlParser::parseRss2(
 	{
 		if (!xmlStrcasecmp(rootNode->name, (xmlChar *) "channel"))
 		{
+			unsigned long itemCount = xmlChildElementCount(rootNode), i = 0;
 			for (
 				auto channelNode = rootNode->children;
 				channelNode;
-				channelNode = channelNode->next
+				channelNode = channelNode->next, i++
 			)
 			{
 				if (!xmlStrcasecmp(channelNode->name, (xmlChar *) "item"))
@@ -311,7 +320,12 @@ bool XmlParser::parseAtom(
 	}
 	PRINT_TITLE(title.c_str());
 
-	for (auto rootNode = root->children; rootNode; rootNode = rootNode->next)
+	unsigned long itemCount = xmlChildElementCount(root), i = 0;
+	for (
+		auto rootNode = root->children;
+		rootNode;
+		rootNode = rootNode->next, i++
+	)
 	{
 		if (!xmlStrcasecmp(rootNode->name, (xmlChar *) "entry"))
 		{
@@ -320,7 +334,7 @@ bool XmlParser::parseAtom(
 				auto entryNode = rootNode->children;
 				entryNode;
 				entryNode = entryNode->next
-				)
+			)
 			{
 				if (!xmlStrcasecmp(entryNode->name, (xmlChar *) "title"))
 				{
@@ -342,7 +356,7 @@ bool XmlParser::parseAtom(
 						auto authorNode = entryNode->children;
 						authorNode;
 						authorNode = authorNode->next
-						)
+					)
 					{
 						if (
 							!xmlStrcasecmp(authorNode->name, (xmlChar *) "name")

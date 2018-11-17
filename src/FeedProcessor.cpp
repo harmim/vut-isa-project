@@ -31,15 +31,22 @@
 		if (ctx) SSL_CTX_free(ctx); \
 	}
 
+#ifdef DEBUG
 #define PROCESS_BIO_ERROR \
 	{ \
-		if (ERR_get_error()) \
-			PRINTF_ERR( \
-				"Bio error: %s.\n", ERR_reason_error_string(ERR_get_error()) \
-			); \
+		PRINTF_ERR( \
+			"Bio error: %s.\n", ERR_reason_error_string(ERR_get_error()) \
+		); \
 		CLEAN_RESOURCES; \
 		PROCESS_ERROR; \
 	}
+#else
+#define PROCESS_BIO_ERROR \
+	{ \
+		CLEAN_RESOURCES; \
+		PROCESS_ERROR; \
+	}
+#endif
 
 
 bool FeedProcessor::processFeeds(
@@ -55,6 +62,10 @@ bool FeedProcessor::processFeeds(
 	for (const auto &url : urlList)
 	{
 		counter++;
+		if (counter != 1 && counter <= urlListSize)
+		{
+			printf("\n");
+		}
 
 		UrlParser urlParser;
 		if (!urlParser.parseUrl(url))
@@ -215,11 +226,6 @@ bool FeedProcessor::processFeeds(
 		{
 			CLEAN_RESOURCES;
 			PROCESS_ERROR;
-		}
-
-		if (counter < urlListSize)
-		{
-			printf("\n");
 		}
 
 		CLEAN_RESOURCES;
