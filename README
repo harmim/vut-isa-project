@@ -9,18 +9,19 @@ formátu Atom a RSS. Podporované verze zdroje jsou Atom 1.0, RSS 1.0 a RSS 2.0.
 Program po spuštění stáhne zadané zdroje a na standardní výstup vypíše
 informace požadované uživatelem.
 
-### Vytvoření spustitelného programu ze zdrojových kódů
-Překladový systém je vytvořen v programu CMake (nastavení překladače,
+### Vytvoření spustitelného programu ze zdrojových souborů
+Překladový systém je vytvořen v programu `CMake` (nastavení překladače,
 parametry překladu, definice zdrojových souborů, spustitelný soubor a
-linkované knihovny). Nicméně je zde vytvořen překlad programem Make, který
-využívá CMake. `make` nebo `make feedreader` vytvoří spustilený soubor
+linkované knihovny). Nicméně je zde vytvořen překlad programem `Make`, který
+využívá `CMake`. `make` nebo `make feedreader` vytvoří spustilený soubor
 `feedreader` v kořenovém adresáři. `make clean` odstraní všechny soubory
 vytvořené při překladu.
 
 ### Použití programu
 Po překladu je možné spouštět vytvořený spustitelný soubor `feedreader`.
-Syntaxe a sémantika spouštění:
-`./feedreader <url | -f <feedFile>> [-c <certFile>] [-C <certDir>] [-T] [-a] [-u]`
+Syntaxe a sémantika spouštění programu:
+`./feedreader <url | -f <feedFile>> [-c <certFile>] [-C <certDir>] [-T] [-a]
+[-u]`
   - `url` URL zdroje.
   - `-f <feedFile>` Soubor `feedfile`. (Textový soubor, kde je na každém řádku
     uvedena URL zdroje. Prázdné řádky a řádky začínající znakem `#` jsou

@@ -3,6 +3,8 @@
 EXECUTABLE := feedreader
 BUILD_DIR := cmake-build-release
 PACK := xharmi00
+DOC_DIR = doc
+DOC = manual.pdf
 
 
 .PHONY: $(EXECUTABLE)
@@ -15,16 +17,26 @@ $(EXECUTABLE):
 
 .PHONY: clean
 clean:
-	rm -rf $(EXECUTABLE) $(BUILD_DIR) $(PACK).tar
+	rm -rf $(EXECUTABLE) $(BUILD_DIR) $(PACK).tar $(DOC)
+	cd $(DOC_DIR) && make clean
 
 
 .PHONY: pack
 pack: $(PACK).tar
 
-$(PACK).tar:
-	tar -cf $@ CMakeLists.txt Makefile README src/*
+$(PACK).tar: doc
+	tar -cf $@ CMakeLists.txt Makefile README $(DOC) src/*
 
 
 .PHONY: test
 test:
 	@ echo 'TODO'
+
+
+.PHONY: doc
+doc: $(DOC)
+
+.PHONY: $(DOC)
+$(DOC):
+	cd $(DOC_DIR) && make
+	cp $(DOC_DIR)/$(DOC) .
