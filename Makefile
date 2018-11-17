@@ -25,7 +25,7 @@ clean:
 pack: $(PACK).tar
 
 $(PACK).tar: doc
-	tar -cf $@ CMakeLists.txt Makefile README $(DOC) src/*
+	COPYFILE_DISABLE=1 tar -cf $@ CMakeLists.txt Makefile README $(DOC) src/*
 
 
 .PHONY: test
