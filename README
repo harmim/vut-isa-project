@@ -43,6 +43,7 @@ schémata zdrojů jsou `http` a `https`.
 - `./CMakeLists.txt`
 - `./Makefile`
 - `./README`
+- `./manual.pdf`
 - `./src/ArgumentProcessor.cpp`
 - `./src/ArgumentProcessor.hpp`
 - `./src/error.hpp`
